@@ -1,2 +1,2 @@
-# wisconsin
-The seminal database benchmark
+# The Wisconsin benchmark
+The seminal database benchmark.
