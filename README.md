@@ -9,7 +9,5 @@ For each database system considered, we introduce a directory
 to hold the schema, data and query file. Systems my have slightl
 different SQL syntax.
 
-The SQALPEL directory contains files made accessible to SQALPEL
-to provided additional documentation, and can be used as the
-landing place for a textual project backup dump.
-SQALPEL needs authorized access to the repository for this.
+The .sqalpel.yml file contains the minimal configuration
+to create a SQALPEL project.

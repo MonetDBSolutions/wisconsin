@@ -67,7 +67,7 @@ def gen_table(name, cnt):
                  variant[int(unique2 / len(variant) / len(variant)) % len(variant)]
             even = 2 + (c % 50) * 2
             odd = 1 + (c % 50) * 2
-            f.write(f"{unique1},{unique2},{c % 2},{c % 4},{c % 10},{c % 20},{c % 100},"
+            f.write(f"{unique1},{c},{c % 2},{c % 4},{c % 10},{c % 20},{c % 100},"
                   f"{c % 1000},{c % 2000},{c % 5000},{c % 10000},"
                   f"{odd},{even},{s1},{s2}\n")
     f.close()

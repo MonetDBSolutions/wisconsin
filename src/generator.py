@@ -13,7 +13,7 @@ a specific DBMS.
 """
 import argparse
 import table
-import queries
+import random
 
 parser = argparse.ArgumentParser(
     description='wisconsin.py is the generator for the Wisonsin benchmark database scripts.',
@@ -34,8 +34,11 @@ if __name__ == '__main__':
     if len(l) != len(s):
         print('Incompatible name and size list arguments')
         exit()
+        
     for name, size in zip(l,s):
         size = int(size)
+        random.seed(size)
+
         with open(f"{name}schema.sql", 'w') as f:
             with open(f"{name}load.sql", 'w') as l:
                 l.write(table.gen_load(name, size))
