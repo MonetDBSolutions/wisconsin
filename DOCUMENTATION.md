@@ -1,9 +1,5 @@
-The Wisconsin Benchmark described in 
-[Bitton, DeWitt, and Turbyfill 1983](http://www.vldb.org/conf/1983/P008.PDF) 
-[Boral and DeWitt 1984](https://dl.acm.org/citation.cfm?doid=602259.602283)
-[Bitton and Turbyfill 1988](https://dl.acm.org/citation.cfm?id=48770), and 
-[DeWitt 1993](http://jimgray.azurewebsites.net/benchmarkhandbook/chapter4.pdf_) 
-is the first effort to systematically measure and compare the performance of relational
+The Wisconsin Benchmark  is the first effort to systematically measure and 
+compare the performance of relational
 database systems with database machines.  The benchmark is a
 single-user and single-factor experiment using a synthetic database
 and a controlled workload.  It measures the query optimization
@@ -23,3 +19,8 @@ unrealistic query tests.  A number of efforts have been made to extend
 the benchmark to incorporate the multi-user test.  However, they do
 not receive the same acceptance as the original Wisconsin benchmark
 except an extension work called the AS3AP benchmark.
+
+[Bitton, DeWitt, and Turbyfill 1983](http://www.vldb.org/conf/1983/P008.PDF) 
+[Boral and DeWitt 1984](https://dl.acm.org/citation.cfm?doid=602259.602283)
+[Bitton and Turbyfill 1988](https://dl.acm.org/citation.cfm?id=48770), and 
+[DeWitt 1993](http://jimgray.azurewebsites.net/benchmarkhandbook/chapter4.pdf_)

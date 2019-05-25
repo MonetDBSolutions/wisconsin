@@ -1,5 +1,5 @@
 -- # the Sqalpel documentation section
-  documentation : documents.md
+  documentation : DOCUMENTATION.md
 
 -- # bulk load script for the experiments
-  experiments : experiments.sql
+  experiments : EXPERIMENTS.sql
