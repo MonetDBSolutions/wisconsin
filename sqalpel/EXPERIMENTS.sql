@@ -1,38 +1,38 @@
---Query1
+--Query01
 --(no index) & Query 3 (clustered index) - 1% selection
 INSERT INTO TMP
 SELECT * FROM TENKTUP1
 WHERE unique2 BETWEEN 0 AND 99
 
---Query2
+--Query02
 --(no index) & Query 4 (clustered index) - 10% selection
 INSERT INTO TMP
 SELECT * FROM TENKTUP1
 WHERE unique2 BETWEEN 792 AND 1791
 
---Query5
+--Query05
 --1% selection via a non-clustered index
 INSERT INTO TMP
 SELECT * FROM TENKTUP1
 WHERE unique1 BETWEEN 0 AND 99
 
---Query6
+--Query06
 --10% selection via a non-clustered index
 INSERT INTO TMP
 SELECT * FROM TENKTUP1
 WHERE unique1 BETWEEN 792 AND 1791
 
---Query7
+--Query07
 --single tuple selection via clustered index to screen
 SELECT * FROM TENKTUP1
 WHERE unique2 = 2001
 
---Query8
+--Query08
 --1% selection via clustered index to screen
 SELECT * FROM TENKTUP1
 WHERE unique2 BETWEEN 0 AND 99
 
---Query9
+--Query09
 --(no index) and Query 12 (clustered index) - JoinAselB
 INSERT INTO TMP
 SELECT * FROM TENKTUP1, TENKTUP2
@@ -80,7 +80,7 @@ WHERE (ONEKTUP.unique1 = TENKTUP1.unique1)
 AND (TENKTUP1.unique1 = TENKTUP2.unique1)
 AND (TENKTUP1.unique1 < 1000)
 
--- Quer18
+-- Query18
 --Projection with 1% Projection
 INSERT INTO TMP
 SELECT DISTINCT two, four, ten, twenty, onePercent, string4
