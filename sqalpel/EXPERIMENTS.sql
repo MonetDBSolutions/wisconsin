@@ -72,7 +72,7 @@ INSERT INTO TMP
 SELECT * FROM TENKTUP1, BPRIME
 WHERE (TENKTUP1.unique1 = BPRIME.unique1)
 
--- Quer17
+-- Query17
 --(non-clustered index) - JoinCselAselB
 INSERT INTO TMP
 SELECT * FROM ONEKTUP, TENKTUP1
