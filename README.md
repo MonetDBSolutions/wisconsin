@@ -6,8 +6,8 @@ as described in [DeWitt 1993](http://jimgray.azurewebsites.net/benchmarkhandbook
 
 The data generator is available as a Python program in ./src
 For each database system considered, we introduce a directory
-to hold the schema, data and query file. Systems my have slightl
-different SQL syntax.
+to hold the schema, data and query file because systems my have slightl
+different SQL syntax and data load conventions.
 
-The .sqalpel.yml file contains the minimal configuration
+The sqalpel folder contains the minimal configuration
 to create a SQALPEL project.
