@@ -123,7 +123,8 @@ INSERT INTO TENKTUP1 VALUES(10001,74,0, 2,0,10,50,688,
 --(no index) and Query 30 (with indices) - Delete 1 tuple
 DELETE FROM TENKTUP1 WHERE unique1=10001
 
--- Query28--(no indices) and Query 31 (with indices) - Update key attribute
+-- Query28
+--(no indices) and Query 31 (with indices) - Update key attribute
 UPDATE TENKTUP1
 SET unique2 = 10001 WHERE unique2 = 1491
 
