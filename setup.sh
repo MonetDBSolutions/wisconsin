@@ -15,7 +15,6 @@ do
 
     if [ ${DB} == 'monetdb' ]
     then
-        monetdb stop wisconsin
         monetdb destroy wisconsin -f
         monetdb create wisconsin
         monetdb release wisconsin
@@ -35,4 +34,5 @@ done
 for f in `ls data/*load.sql`
 do
     echo "Loading the table ${f}"
+    mclient -d wisconsin ${f}
 done
