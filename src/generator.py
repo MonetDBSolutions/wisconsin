@@ -6,7 +6,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Copyright 2019- Stichting Sqalpel
 
 Author: M Kersten
-This simple program generates the schema.sql, load.sql, and <name>.csv
+This simple program generates the schema.sql.sql, load.sql, and <name>.csv
 files to initialize a Wisconsin Benchmark database.
 Variations are easily constructed to create files acceptable for
 a specific DBMS.
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         size = int(size)
         random.seed(size)
 
-        with open(f"{name}schema.sql", 'w') as f:
+        with open(f"{name}schema.sql.sql", 'w') as f:
             with open(f"{name}load.sql", 'w') as l:
                 l.write(table.gen_load(name, size))
                 f.write(table.gen_schema(name))

@@ -9,34 +9,26 @@ then
     exit
 fi
 
-for n in `ls data/*schema.sql`
-do
-    echo "create a new database instance '${n}' for ${DB}"
 
-    if [ ${DB} == 'monetdb' ]
-    then
-        monetdb destroy wisconsin -f
-        monetdb create wisconsin
-        monetdb release wisconsin
-        mclient -d wisconsin ${n}
-    fi
-    if [ ${DB} == 'postgresql' ]
-    then
-        echo "Not yet implemented"
-    fi
-    if [ ${DB} == 'sqlite' ]
-    then
-        echo "Not yet impemented"
-    fi
-done
+echo "create a new database instance for ${DB}"
+
+if [ ${DB} == 'monetdb' ]
+then
+    monetdb destroy wisconsin -f
+    monetdb create wisconsin
+    monetdb release wisconsin
+    mclient -d wisconsin data/schema.sql
+fi
+if [ ${DB} == 'postgresql' ]
+then
+    echo "Not yet implemented"
+fi
+if [ ${DB} == 'sqlite' ]
+then
+    echo "Not yet impemented"
+fi
 
 # for now we assume that we only load into MonetDB
-PWD=`pwd`
-for f in `ls data/*load.sql`
-do
-    echo "Loading the table ${f}"
-    sed -e "s/@PWD/${PWD}" ${f} > ${f}.bak
-    cat ${f}.bak
-    mclient -d wisconsin ${f}.bak
-    rm ${f}.bak
-done
+# Change the relative paths into full paths
+
+mclient -d wisconsin data/load.sql
