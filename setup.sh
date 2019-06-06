@@ -29,6 +29,10 @@ then
 fi
 
 # for now we assume that we only load into MonetDB
-# Change the relative paths into full paths
-
-mclient -d wisconsin data/load.sql
+if [ ${DB} == 'monetdb' ]
+    cat data/ONEKTUP.csv | mclient -d wisconsin -s "copy into ONEKTUP from STDIN";
+    cat data/TENKTUP1.csv | mclient -d wisconsin -s "copy into TENKTUP1 from STDIN";
+    cat data/TENKTUP2.csv | mclient -d wisconsin -s "copy into TENKTUP2 from STDIN";
+else
+    echo "Not yet implemented"
+fi

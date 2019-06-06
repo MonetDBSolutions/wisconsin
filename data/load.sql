@@ -1,3 +1,4 @@
-copy 1024 records into ONEKTUP from '@PWD/data/ONEKTUP.csv';
-copy 10240 records into TENKTUP1 from '@PWD/data/TENKTUP1.csv';
-copy 10240 records into TENKTUP2 from '@PWD/data/TENKTUP2.csv';
+cat data/ONEKTUP.csv | mclient -d wisconsin -s "copy into ONEKTUP from STDIN";
+cat data/TENKTUP1.csv | mclient -d wisconsin -s "copy into TENKTUP1 from STDIN";
+cat data/TENKTUP2.csv | mclient -d wisconsin -s "copy into TENKTUP2 from STDIN";
+
