@@ -11,9 +11,9 @@ fi
 
 for n in `ls data/*schema.sql`
 do
-    echo "create a new database instance '${n}' for ${DBMS}"
+    echo "create a new database instance '${n}' for ${DB}"
 
-    if [ db == 'monetdb' ]
+    if [ ${DB} == 'monetdb' ]
     then
         monetdb stop wisconsin
         monetdb destroy wisconsin -f
