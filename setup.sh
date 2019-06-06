@@ -35,7 +35,8 @@ PWD=`pwd`
 for f in `ls data/*load.sql`
 do
     echo "Loading the table ${f}"
-    sed -e "s/@PWD/${PWD}" ${f}
-    cat ${f}
-    mclient -d wisconsin ${f}
+    sed -e "s/@PWD/${PWD}" ${f} > ${f}.bak
+    cat ${f}.bak
+    mclient -d wisconsin ${f}.bak
+    rm ${f}.bak
 done
