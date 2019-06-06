@@ -31,8 +31,11 @@ do
 done
 
 # for now we assume that we only load into MonetDB
+PWD=`pwd`
 for f in `ls data/*load.sql`
 do
     echo "Loading the table ${f}"
+    sed -e "s/@PWD/${PWD}" ${f}
+    cat ${f}
     mclient -d wisconsin ${f}
 done

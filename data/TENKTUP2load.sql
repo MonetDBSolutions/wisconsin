@@ -1,1 +1,1 @@
-copy 10000 records into TENKTUP2 from TENKTUP2.csv;
+copy 10000 records into TENKTUP2 from '@PWD/data/TENKTUP2.csv';

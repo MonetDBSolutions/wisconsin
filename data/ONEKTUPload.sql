@@ -1,1 +1,1 @@
-copy 1000 records into ONEKTUP from ONEKTUP.csv;
+copy 1000 records into ONEKTUP from '@PWD/data/ONEKTUP.csv';
