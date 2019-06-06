@@ -1,7 +1,7 @@
 # the Sqalpel minimal environment to bootstrap a project
   projectname : Wisconsin
   projecttitle : 'The seminal database benchmark'
-  documentation : docDOCUMENTATION.md
+  documentation : doc/DOCUMENTATION.md
   setup : doc/SETUP.md
  # experiments : <path to experiments>.yaml
   experiments:
@@ -146,7 +146,7 @@
 # The minimal database properties section
   databases :
      - name : basic
-       remarkt : "The minimal setup"
+       remarks : "The minimal setup"
      - name : large
        remarks : "The 1993 version"
 # The DBMS that can be used to create an instance

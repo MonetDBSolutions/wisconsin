@@ -1,20 +1,38 @@
 #!/bin/bash
 
-# This is a MonetDB specific script to instantiate a clean Wisconsin database
-# It requires a database id and a target DBMS
+# This is generic script to instantiate a clean Wisconsin database on a number of database backends.
+DB=monetdb
 
 if [ $# == 0 ]
 then
-    echo "No target DBMS specified {monetdb,...}"
+    echo "No target DBMS specified: monetdb, postgresql, sqlite"
     exit
 fi
 
-for n in `ls *schema.sql`
+for n in `ls data/*schema.sql`
 do
-    echo "create a new database instance for ${n{}"
-    monetdb stop wisconsin
-    monetdb destroy wisconsin -f
-    monetdb create wisconsin
-    monetdb release wisconsin
-    mclient -d wisconsin ${n}
+    echo "create a new database instance '${n}' for ${DBMS}"
+
+    if [ db == 'monetdb' ]
+    then
+        monetdb stop wisconsin
+        monetdb destroy wisconsin -f
+        monetdb create wisconsin
+        monetdb release wisconsin
+        mclient -d wisconsin ${n}
+    fi
+    if [ ${DB} == 'postgresql' ]
+    then
+        echo "Not yet implemented"
+    fi
+    if [ ${DB} == 'sqlite' ]
+    then
+        echo "Not yet impemented"
+    fi
+done
+
+# for now we assume that we only load into MonetDB
+for f in `ls data/*load.sql`
+do
+    echo "Loading the table ${f}"
 done
