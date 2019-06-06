@@ -34,9 +34,6 @@ tabletemplate = "DROP TABLE  IF EXISTS %s;\n" \
 def gen_schema(name):
     return tabletemplate % (name, name)
 
-def gen_load(name, cnt):
-    return f"copy {cnt} records into {name} from '@PWD/data/{name}.csv';\n"
-
 patterns = [
     "AxxxxxxxxxxxxxxxxxxxxxxxxAxxxxxxxxxxxxxxxxxxxxxxxA",
     "HxxxxxxxxxxxxxxxxxxxxxxxxHxxxxxxxxxxxxxxxxxxxxxxxH",

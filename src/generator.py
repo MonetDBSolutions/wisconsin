@@ -35,12 +35,9 @@ if __name__ == '__main__':
         print('Incompatible name and size list arguments')
         exit()
     with open('schema.sql', 'w') as f:
-        with open('load.sql', 'w') as g:
-            for name, size in zip(l,s):
-                size = int(size)
-                random.seed(size)
-                g.write(table.gen_load(name, size))
-                f.write(table.gen_schema(name))
-                table.gen_table(name, size)
+        for name, size in zip(l,s):
+            size = int(size)
+            random.seed(size)
+            f.write(table.gen_schema(name))
+            table.gen_table(name, size)
         f.close()
-        g.close()
