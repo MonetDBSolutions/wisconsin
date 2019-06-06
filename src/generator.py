@@ -19,8 +19,8 @@ parser = argparse.ArgumentParser(
     description='wisconsin.py is the generator for the Wisonsin benchmark database scripts.',
     formatter_class=argparse.HelpFormatter)
 
-parser.add_argument('--name', type=str, help='Table name', default='TENTUP1')
-parser.add_argument('--size', type=str, help='Table size', default='10')
+parser.add_argument('--name', type=str, help='Table names', default='ONEKTUP,TENKTUP1,TENKTUP2')
+parser.add_argument('--size', type=str, help='Table sizes', default='1024,10240,10240')
 parser.add_argument('--version', help='Show version info', action='store_true')
 
 
@@ -34,15 +34,13 @@ if __name__ == '__main__':
     if len(l) != len(s):
         print('Incompatible name and size list arguments')
         exit()
-        
-    for name, size in zip(l,s):
-        size = int(size)
-        random.seed(size)
-
-        with open(f"{name}schema.sql.sql", 'w') as f:
-            with open(f"{name}load.sql", 'w') as l:
-                l.write(table.gen_load(name, size))
+    with open('schema.sql', 'w') as f:
+        with open('load.sql', 'w') as g:
+            for name, size in zip(l,s):
+                size = int(size)
+                random.seed(size)
+                g.write(table.gen_load(name, size))
                 f.write(table.gen_schema(name))
                 table.gen_table(name, size)
         f.close()
-        l.close()
+        g.close()

@@ -18,7 +18,6 @@ stringu2 varchar(52) NOT NULL,
 string4 varchar(52) NOT NULL,
 PRIMARY KEY (unique2)
 );
-
 DROP TABLE  IF EXISTS TENKTUP1;
 CREATE TABLE TENKTUP1(
 unique1 integer NOT NULL,
@@ -39,7 +38,6 @@ stringu2 varchar(52) NOT NULL,
 string4 varchar(52) NOT NULL,
 PRIMARY KEY (unique2)
 );
-
 DROP TABLE  IF EXISTS TENKTUP2;
 CREATE TABLE TENKTUP2(
 unique1 integer NOT NULL,

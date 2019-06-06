@@ -58,7 +58,7 @@ def gen_table(name, cnt):
             unique2 = u2[i2]
             del u1[i1]
             del u2[i2]
-
+            s0 = patterns[random.randint(0, 3)]
             s1 = variant[int(unique1 % len(variant))] + 'x' * 25 + \
                  variant[int(unique1 / len(variant)) % len(variant)] + 'x' * 24 + \
                  variant[int(unique1 / len(variant) / len(variant)) % len(variant)]
@@ -69,5 +69,5 @@ def gen_table(name, cnt):
             odd = 1 + (c % 50) * 2
             f.write(f"{unique1},{c},{c % 2},{c % 4},{c % 10},{c % 20},{c % 100},"
                   f"{c % 1000},{c % 2000},{c % 5000},{c % 10000},"
-                  f"{odd},{even},{s1},{s2}\n")
+                  f"{odd},{even},{s0},{s1},{s2}\n")
     f.close()
