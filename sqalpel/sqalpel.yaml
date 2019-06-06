@@ -1,5 +1,0 @@
-# the Sqalpel minimal environment to bootstrap a project
-  projectname : Wisconsin
-  projecttitle : 'The seminal database benchmark'
-  documentation : DOCUMENTATION.md
-  experiments : EXPERIMENTS.sql
