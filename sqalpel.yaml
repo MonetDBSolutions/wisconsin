@@ -5,7 +5,10 @@
   setup : doc/SETUP.md
  # experiments : <path to experiments>.yaml
   experiments:
+
     - name : Query01
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       remark : (no index) & Query 3 (clustered index) - 1% selection
       source : INSERT INTO TMP
                SELECT * FROM TENKTUP1
@@ -13,53 +16,66 @@
 
     - name : Query02
       remark : (no index) & Query 4 (clustered index) - 10% selection
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : INSERT INTO TMP
                SELECT * FROM TENKTUP1
                WHERE unique2 BETWEEN 792 AND 1791
 
     - name : Query05
       remark : 1% selection via a non-clustered index
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : INSERT INTO TMP
                SELECT * FROM TENKTUP1
                WHERE unique1 BETWEEN 0 AND 99
 
     - name : Query06
       remark : 10% selection via a non-clustered index
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : INSERT INTO TMP
                SELECT * FROM TENKTUP1
                WHERE unique1 BETWEEN 792 AND 1791
 
     - name : Query07
       remark : single tuple selection via clustered index to screen
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : SELECT * FROM TENKTUP1
                WHERE unique2 = 2001
 
     - name : Query08
       remark : 1% selection via clustered index to screen
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : SELECT * FROM TENKTUP1
                WHERE unique2 BETWEEN 0 AND 99
 
     - name : Query09
       remark : (no index) and Query 12 (clustered index) - JoinAselB
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : INSERT INTO TMP
                SELECT * FROM TENKTUP1, TENKTUP2
                WHERE (TENKTUP1.unique2 = TENKTUP2.unique2)
                AND (TENKTUP2.unique2 < 1000)
 
-    - name : Bprime
-      remark : updateQuery to make Bprime relation
-      source : INSERT INTO BPRIME
-               SELECT * FROM TENKTUP2
-               WHERE TENKTUP2.unique2 < 1000
-
     - name : Query10
       remark : (no index) and Query 13 (clustered index) - JoinABprime
+      before : CREATE TABLE tmp LIKE( ONEKTUP);
+               CREATE TABLE BPRIME LIKE( ONEKTUP) AS
+               SELECT * FROM TENKTUP2
+               WHERE TENKTUP2.unique2 < 1000
+      after : DROP TABLE tmp; DROP TABLE BPRIME;
       source : INSERT INTO TMP
                SELECT * FROM TENKTUP1, BPRIME
                WHERE (TENKTUP1.unique2 = BPRIME.unique2)
 
     - name : Query11
       remark : (no index) and Query 14 (clustered index) - JoinCselAselB
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : INSERT INTO TMP
                SELECT * FROM ONEKTUP, TENKTUP1
                WHERE (ONEKTUP.unique2 = TENKTUP1.unique2)
@@ -68,6 +84,8 @@
 
     - name : Query15
       remark : (non-clustered index) - JoinAselB
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : INSERT INTO TMP
                SELECT * FROM TENKTUP1, TENKTUP2
                WHERE (TENKTUP1.unique1 = TENKTUP2.unique1)
@@ -75,12 +93,19 @@
 
     - name : Query16
       remark : (non-clustered index) - JoinABprime
+      before : CREATE TABLE tmp LIKE( ONEKTUP);
+               CREATE TABLE BPRIME LIKE( ONEKTUP) AS
+               SELECT * FROM TENKTUP2
+               WHERE TENKTUP2.unique2 < 1000
+      after : DROP TABLE tmp; DROP TABLE BPRIME;
       source : INSERT INTO TMP
                SELECT * FROM TENKTUP1, BPRIME
                WHERE (TENKTUP1.unique1 = BPRIME.unique1)
 
     - name : Query17
       remark : (non-clustered index) - JoinCselAselB
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : INSERT INTO TMP
                SELECT * FROM ONEKTUP, TENKTUP1
                WHERE (ONEKTUP.unique1 = TENKTUP1.unique1)
@@ -89,12 +114,16 @@
 
     - name : Query18
       remark : Projection with 1% Projection
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : INSERT INTO TMP
                SELECT DISTINCT two, four, ten, twenty, onePercent, string4
                FROM TENKTUP1
 
     - name : Query19
       remark : Projection with 100% Projection
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : INSERT INTO TMP
                SELECT DISTINCT two, four, ten, twenty, onePercent,
                tenPercent, twentyPercent, fiftyPercent, unique3,
@@ -103,23 +132,31 @@
 
     - name : Query20
       remark : (no index) and Query 23 (with clustered index) Minimum Aggregate Function
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : INSERT INTO TMP
                SELECT MIN (TENKTUP1.unique2) FROM TENKTUP1
 
     - name : Query21
       remark : (no index) and Query 24 (with clustered index) Minimum Aggregate Function with 100 Partitions
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : INSERT INTO TMP
                SELECT MIN (TENKTUP1.unique3) FROM TENKTUP1
                GROUP BY TENKTUP1.onePercent
 
     - name : Query22
       remark : (no index) and Query 25 (with clustered index) Sun Aggregate Function with 100 Partitions
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : INSERT INTO TMP
                SELECT SUM (TENKTUP1.unique3) FROM TENKTUP1
                GROUP BY TENKTUP1.onePercent
 
     - name : Query26
       remark : (no indices) and Query 29 (with indices) - Insert 1 tuple
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : INSERT INTO TENKTUP1 VALUES(10001,74,0, 2,0,10,50,688,
                1950,4950,9950,1,100,
                'MxxxxxxxxxxxxxxxxxxxxxxxxxGxxxxxxxxxxxxxxxxxxxxxxxxC',
@@ -128,15 +165,21 @@
 
     - name : Query27
       remark : (no index) and Query 30 (with indices) - Delete 1 tuple
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : DELETE FROM TENKTUP1 WHERE unique1=10001
 
     - name : Query28
       remark : (no indices) and Query 31 (with indices) - Update key attribute
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : UPDATE TENKTUP1
                SET unique2 = 10001 WHERE unique2 = 1491
 
     - name : Query32
       remark : (with indices) - Update indexed non-key attribute
+      before : CREATE TABLE tmp LIKE( ONEKTUP)
+      after : DROP TABLE tmp
       source : UPDATE TENKTUP1
                SET unique1 = 10001 WHERE unique1 = 1491
 # The variables used within the queries can be separately defined
