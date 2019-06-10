@@ -5,7 +5,6 @@
   setup : doc/SETUP.md
  # experiments : <path to experiments>.yaml
   experiments:
-
     - name : Query01
       before : CREATE TABLE tmp LIKE( ONEKTUP)
       after : DROP TABLE tmp
@@ -66,7 +65,7 @@
       before : CREATE TABLE tmp LIKE( ONEKTUP);
                CREATE TABLE BPRIME LIKE( ONEKTUP) AS
                SELECT * FROM TENKTUP2
-               WHERE TENKTUP2.unique2 < 1000
+               WHERE TENKTUP2.unique2 < 1000;
       after : DROP TABLE tmp; DROP TABLE BPRIME;
       source : INSERT INTO TMP
                SELECT * FROM TENKTUP1, BPRIME
@@ -96,7 +95,7 @@
       before : CREATE TABLE tmp LIKE( ONEKTUP);
                CREATE TABLE BPRIME LIKE( ONEKTUP) AS
                SELECT * FROM TENKTUP2
-               WHERE TENKTUP2.unique2 < 1000
+               WHERE TENKTUP2.unique2 < 1000;
       after : DROP TABLE tmp; DROP TABLE BPRIME;
       source : INSERT INTO TMP
                SELECT * FROM TENKTUP1, BPRIME
@@ -189,10 +188,10 @@
 # The minimal database properties section
   databases :
      - name : basic
-       remarks : "The minimal setup"
+       remark : "The minimal setup"
      - name : large
-       remarks : "The 1993 version"
+       remark : "The 1993 version"
 # The DBMS that can be used to create an instance
   dbms :
-     MonetDB
-     Postgresql
+     - MonetDB
+       Postgresql
