@@ -20,6 +20,10 @@ the benchmark to incorporate the multi-user test.  However, they do
 not receive the same acceptance as the original Wisconsin benchmark
 except an extension work called the AS3AP benchmark.
 
+This version of the Wisconsin benchmark is not meant to exercise the
+current state of affairs in database management systems, but rather
+acts as a demonstration of the Sqalpel functionality.
+
 [Bitton, DeWitt, and Turbyfill 1983](http://www.vldb.org/conf/1983/P008.PDF) 
 [Boral and DeWitt 1984](https://dl.acm.org/citation.cfm?doid=602259.602283)
 [Bitton and Turbyfill 1988](https://dl.acm.org/citation.cfm?id=48770), and 
