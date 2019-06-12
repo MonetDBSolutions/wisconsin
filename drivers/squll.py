@@ -67,27 +67,18 @@ if __name__ == '__main__':
         print('Error in sqalpel.yaml')
         exit(-1)
     elif 'parse_error' in repos:
-        print(f"Parse error in sqalpel.yaml {repository}")
+        print(f"Parse error in sqalpel.yaml {args.repository}")
         exit(-1)
 
-    if args.driver not in repos['driver']:
-        print(f'Unkown driver: {args.driver}')
+    if 'driver' not in repos:
+        print(f'Unkown drivers')
         print('Known drivers ', [n for n in repos['driver']])
         exit(0)
 
     # sanity check on the configuration file
-    section = {}
-    for d in repos['driver']:
-        if d['dbms'] == args.dbms:
-            section = d
-            for c in ['ticket', 'bailout', 'debug', 'timeout', 'daemon']:
-                if c not in d['dbms']:
-                    print(f'Configuration key "{c}" not set in {d}')
-                    exit(-1)
-            break
-
+    driver = repos.dbms[args.dbms]
     if args.debug:
-        logging.info(f"DRIVER {section}")
+        logging.info(f"DRIVER {driver}")
 
     # check local/remote processing
     if args.ticket == 'local':
