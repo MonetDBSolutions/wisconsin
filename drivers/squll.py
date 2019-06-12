@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     if args.driver not in repos['driver']:
         print(f'Unkown driver: {args.driver}')
-        print('Known drivers ', [n for n in repos['drivers']])
+        print('Known drivers ', [n for n in repos['driver']])
         exit(0)
 
     # sanity check on the configuration file
