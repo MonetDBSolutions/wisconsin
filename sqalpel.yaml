@@ -168,7 +168,7 @@
      - MonetDB
      - Postgresql
 # The experiment driver is controlled by the following arguments
-driver:
+  driver:
    - name : MonetDB
        debug   : 1
        bailout :
