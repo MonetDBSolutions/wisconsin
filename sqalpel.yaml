@@ -166,4 +166,15 @@
 # The DBMS that can be used to create an instance
   dbms :
      - MonetDB
-       Postgresql
+     - Postgresql
+# The experiment driver is controlled by the following arguments
+driver:
+   - name : MonetDB
+       debug   : 1
+       bailout :
+       timeout :
+       daemon  :
+       ticket  : localhost
+       host    :
+       dbms    : MonetDB
+       db      : base
