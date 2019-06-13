@@ -38,7 +38,7 @@ parser.add_argument('--driver', type=str, help='Target driver', default='MonetDB
 parser.add_argument('--repository', type=str, help='Project Git', default='https://github.com/sqalpel/wisconsin.git')
 parser.add_argument('--dbms', type=str, help='Default DBMS', default='MonetDB')
 parser.add_argument('--db', type=str, help='Default database', default='base')
-parser.add_argument('--host', type=str, help='Default host', default=None)
+parser.add_argument('--host', type=str, help='Default host', default='localhost')
 parser.add_argument('--debug', help='Trace interaction', action='store_false')
 parser.add_argument('--version', help='Show version info', action='store_true')
 
@@ -70,13 +70,16 @@ if __name__ == '__main__':
         print(f"Parse error in sqalpel.yaml {args.repository}")
         exit(-1)
 
-    if 'driver' not in repos:
-        print(f'Unkown drivers')
-        print('Known drivers ', [n for n in repos['driver']])
+    if 'dbms' not in repos:
+        print(f'Unkown dbms drivers')
         exit(0)
 
     # sanity check on the configuration file
-    driver = repos.dbms[args.dbms]
+    if not args.dbms in repos['dbms']:
+        print(f'Unkown driver {args.dbms}')
+        exit(-1)
+    driver = repos['dbms'][args.dbms]
+
     if args.debug:
         logging.info(f"DRIVER {driver}")
 
@@ -96,20 +99,24 @@ if __name__ == '__main__':
             exit(-1)
 
     # process the queries in the repository
-    queries = None
+    experiments = None
     if args.repository:
         if args.debug:
             print(f'process Git repository {args.repository}')
         if Repository.isvalid(args.repository):
-            errors, queries = Repository.get_experiments(args.repository)
+            config = Repository.get_experiments(args.repository)
+            if not config or 'experiments' not in config:
+                print(f'Invalid experiment configuration {args.repository}')
+                exit(-1)
+            experiments = config['experiments']
             if args.debug:
-                print(f'ERRORS: {errors}')
-                print(f'QUERIES: {queries}')
-            results = runbatch(queries)
+                print(f"QUERIES: {len(experiments)}")
+            results = runbatch(experiments, args)
             print(results)
             exit(0)
         else:
             print(f'Invalid repository URL {args.repository}')
+            exit(-1)
 
     # Connect to the sqalpel.io webserver for the real work
     conn = Connection(section)

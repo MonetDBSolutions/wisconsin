@@ -25,6 +25,7 @@ Internal metrics, e.g. cpu load, is returned as a JSON structure in 'metrics' co
 import re
 import subprocess
 import shlex
+import logging
 import time
 import pymonetdb
 import os
@@ -40,13 +41,14 @@ def runtask(task):
         print('Undefined task platform', task['dbms'])
     return results
 
-def runbatch(queries):
+def runbatch(queries, args):
     logging.info('Run a batch of queries')
     results = []
     for q in queries:
+        print(q)
         task = {'dbms': args.dbms,
-                'query':q['query'],
-                'xname': q['xname'],
+                'query':q['source'],
+                'xname': q['name'],
                 'db': args.db,
                 'params': '',
                 'options': '{}',

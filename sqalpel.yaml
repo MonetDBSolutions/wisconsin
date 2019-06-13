@@ -159,15 +159,15 @@
      - manual : 0, 1, 5, 10, 25, 100
 # The minimal database properties section
   databases :
-     - name : basic
+     - name : wisconsin
        remark : "The minimal setup"
-     - name : large
+     - name : wisconsin_large
        remark : "The 1993 version"
 # The DBMS that can be used to create an instance
   dbms :
-    - MonetDB :
-       debug   : 1
-       bailout :
-       timeout :
-       daemon  :
-    - Postgresql
+    MonetDB :
+      debug   : 1
+      bailout :
+      timeout :
+      daemon  :
+    Postgresql
