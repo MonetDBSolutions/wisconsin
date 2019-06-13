@@ -170,3 +170,8 @@
       bailout :
       timeout :
       daemon  :
+    Postgresql :
+      debug   : 1
+      bailout :
+      timeout :
+      daemon  :
