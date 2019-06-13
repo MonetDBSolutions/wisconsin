@@ -165,9 +165,9 @@
        remark : "The 1993 version"
 # The DBMS that can be used to create an instance
   dbms :
-   - MonetDB :
+    - MonetDB :
        debug   : 1
        bailout :
        timeout :
        daemon  :
-   - Postgresql
+    - Postgresql
