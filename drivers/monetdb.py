@@ -112,7 +112,7 @@ class MonetDB:
                         print('ticks[%s]' % i, times[-1])
                     c.close()
                 except (Exception, pymonetdb.DatabaseError) as msg:
-                    logging.error('EXCEPTION ', msg)
+                    logging.error(f'EXCEPTION  {msg}')
                     error = str(msg).replace("\n", " ").replace("'", "''")
                     break
 

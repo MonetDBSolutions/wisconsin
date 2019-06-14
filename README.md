@@ -21,3 +21,22 @@ Most drivers are structural identical, with minor twists
 depending on the DBMS being addressed. A few specific drivers
 are included as examples on how to create them.
 
+## Installation
+Setting up theaa environment involves a few simple steps.
+First make sure you have pipenv installed on your machine and that the pipenv command can be found in your $PATH.
+If you do a user installation, you will need to add the right folder to your PATH variable.
+
+```
+  pip3 install --user pipenv
+  PYTHON_BIN_PATH="$(python3 -m site --user-base)/bin"
+  export PATH="$PATH:$PYTHON_BIN_PATH"
+  which pipenv
+```
+Thereafter you can checkout this repository in a local directory, activate the virtual environment
+and you are ready to launch the experiment driver.
+```
+  pipenv shell
+  cd drivers
+  python squll.py --help
+```
+
