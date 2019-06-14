@@ -45,17 +45,17 @@
     - name : Query09
       remark : (no index) and Query 12 (clustered index) - JoinAselB
       source : CREATE TEMPORARY TABLE tmp AS
-                 SELECT * FROM TENKTUP1, TENKTUP2
+                 SELECT A.*, B.* FROM TENKTUP1 AS A , TENKTUP2 AS B
                  WHERE (TENKTUP1.unique2 = TENKTUP2.unique2)
                  AND (TENKTUP2.unique2 < 1000);
       after : DROP TABLE tmp;
 
     - name : Query10
       remark : (no index) and Query 13 (clustered index) - JoinABprime
-      before : CREATE TEMPORARY TABLE tmp AS
+      source : CREATE TEMPORARY TABLE tmp AS
                   SELECT * FROM TENKTUP1, BPRIME
                   WHERE (TENKTUP1.unique2 = BPRIME.unique2);
-      source : CREATE TABLE BPRIME LIKE( ONEKTUP) AS
+      before : CREATE TABLE BPRIME LIKE( ONEKTUP) AS
                   SELECT * FROM TENKTUP2
                   WHERE TENKTUP2.unique2 < 1000;
       after: DROP TABLE tmp;
@@ -72,7 +72,7 @@
     - name : Query15
       remark : (non-clustered index) - JoinAselB
       source : CREATE TEMPORARY TABLE tmp AS
-                 SELECT * FROM TENKTUP1, TENKTUP2
+                 SELECT A.* FROM TENKTUP1 AS A, TENKTUP2 AS B
                  WHERE (TENKTUP1.unique1 = TENKTUP2.unique1)
                    AND (TENKTUP1.unique2 < 1000);
       after : DROP TABLE tmp;
@@ -99,16 +99,15 @@
     - name : Query18
       remark : Projection with 1% Projection
       source : CREATE TEMPORARY TABLE tmp AS
-               SELECT DISTINCT two, four, ten, twenty, onePercent, string4
+               SELECT DISTINCT two, four, ten, twenty, hundred, string4
                FROM TENKTUP1;
       after : DROP TABLE tmp;
 
     - name : Query19
       remark : Projection with 100% Projection
       source : CREATE TEMPORARY TABLE tmp AS
-               SELECT DISTINCT two, four, ten, twenty, onePercent,
-               tenPercent, twentyPercent, fiftyPercent, unique3,
-               evenOnePercent, oddOnePercent, stringu1, stringu2, string4
+               SELECT DISTINCT two, four, ten, twenty, hundred, unique3,
+               evenHundred, oddHundred, stringu1, stringu2, string4
                FROM TENKTUP1;
       after : DROP TABLE tmp;
 
@@ -122,14 +121,14 @@
       remark : (no index) and Query 24 (with clustered index) Minimum Aggregate Function with 100 Partitions
       source : CREATE TEMPORARY TABLE tmp AS
                SELECT MIN (TENKTUP1.unique3) FROM TENKTUP1
-               GROUP BY TENKTUP1.onePercent;
+               GROUP BY TENKTUP1.hundred;
       after : DROP TABLE tmp;
 
     - name : Query22
       remark : (no index) and Query 25 (with clustered index) Sun Aggregate Function with 100 Partitions
       source : CREATE TEMPORARY TABLE tmp AS
                SELECT SUM (TENKTUP1.unique3) FROM TENKTUP1
-               GROUP BY TENKTUP1.onePercent;
+               GROUP BY TENKTUP1.hundred;
       after : DROP TABLE tmp;
 
     - name : Query26

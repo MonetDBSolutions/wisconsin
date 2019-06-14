@@ -85,7 +85,7 @@ if __name__ == '__main__':
                     'query': q['source'],
                     'xname': q['name'],
                     'params': '',
-                    'options': '{"runlength":2}'}
+                    'options': '{"runlength":1}'}
             # Before and After commands are optional
             if 'before' in q:
                 task.update({'before': q['before']})
