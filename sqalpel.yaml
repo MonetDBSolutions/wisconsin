@@ -113,7 +113,7 @@
 
     - name : Query20
       remark : (no index) and Query 23 (with clustered index) Minimum Aggregate Function
-      source : ICREATE TEMPORARY TABLE tmp AS
+      source : CREATE TEMPORARY TABLE tmp AS
                SELECT MIN (TENKTUP1.unique2) FROM TENKTUP1;
       after : DROP TABLE tmp;
 
