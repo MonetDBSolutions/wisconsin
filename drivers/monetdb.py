@@ -108,13 +108,14 @@ class MonetDB:
                     if before:
                         logging.info(f'Before {before}')
                     if after:
-                        logging.info(f'Before {after}')
+                        logging.info(f'After {after}')
 
             for i in range(runlength):
                 try:
                     c = conn.cursor()
                     if before:
                         c.execute(before)
+
                     ticks = time.time()
                     c.execute(newquery)
                     r = c.fetchone()
@@ -123,6 +124,7 @@ class MonetDB:
                     else:
                         chks.append('')
                     times.append(int((time.time() - ticks) * 1000))
+
                     if after:
                         c.execute(after)
 

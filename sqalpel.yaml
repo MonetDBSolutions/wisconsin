@@ -6,7 +6,6 @@
   experiments:
     - name : Query01
       remark : (no index) & Query 3 (clustered index) - 1% selection
-      before: CREATE TEMPORARY TABLE tmp like(ONEKTUP)
       after: DROP TABLE tmp
       source : CREATE TEMPORARY TABLE tmp AS
                  SELECT * FROM TENKTUP1
