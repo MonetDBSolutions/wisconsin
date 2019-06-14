@@ -23,8 +23,6 @@ Internal metrics, e.g. cpu load, is returned as a JSON structure in 'metrics' co
 """
 
 import re
-import subprocess
-import shlex
 import logging
 import time
 import pymonetdb
@@ -32,90 +30,37 @@ import os
 import itertools
 import json
 
-def runtask(task):
-    logging.info(f'run task {task}')
-    if task['dbms'].lower() == 'monetdb':
-        results = MonetDBDriver.run(task)
-    else:
-        results = None
-        print('Undefined task platform', task['dbms'])
-    return results
 
-def runbatch(queries, args):
-    logging.info('Run a batch of queries')
-    results = []
-    for q in queries:
-        print(q)
-        task = {'dbms': args.dbms,
-                'query':q['source'],
-                'xname': q['name'],
-                'db': args.db,
-                'params': '',
-                'options': '{}',
-                'debug': args.debug}
-        r = runtask(task)
-        results.append(r)
-    return results
-
-class MonetDBDriver:
-    conn = None
-    db = None
-
-    def __init__(self):
-        pass
+class MonetDB:
 
     @staticmethod
-    def startserver(db):
-        if MonetDBDriver.conn:
-            # avoid duplicate connection
-            if MonetDBDriver.db == db:
-                return None
-            MonetDBDriver.stopserver()
-        print('Start MonetDBDriver', db)
-        try:
-            MonetDBDriver.conn = pymonetdb.connect(database=db)
-        except (Exception, pymonetdb.DatabaseError()) as msg:
-            print('EXCEPTION ', msg)
-            if MonetDBDriver.conn is not None:
-                MonetDBDriver.close()
-            return [{'error': json.dumps(msg), 'times': [], 'chks': [], 'param': []}]
-        return None
-
-    @staticmethod
-    def stopserver():
-        if not MonetDBDriver.conn:
-            return None
-        print('Stop MonetDBDriver')
-        # to be implemented
-        return None
-
-    @staticmethod
-    def run(task):
+    def run(task, debug=True):
         """
         :param task:
+        :param debug:
         :return:
         """
-        debug = task['debug']
-        db = task['db']
-        query = task['query']
-        params = task['params']
+
         options = json.loads(task['options'])
         if 'runlength' in options:
             runlength = int(options['runlength'])
         else:
             runlength = 1
-        print('runs', runlength)
+        if debug:
+            logging.info(f'runs {runlength}')
 
         response = []
         error = ''
-        msg = MonetDBDriver.startserver(db)
-        if msg:
-            MonetDBDriver.stopserver()
-            return msg
+        # always run an experiment in a cleanly started connection
+        try:
+            conn = pymonetdb.connect(database=task['db'])
+        except (Exception, pymonetdb.DatabaseError) as msg:
+            logging.error(f"EXCEPTION {msg}")
+            return {'error': msg, 'times': [], 'chks': [], 'param': []}
 
-        if params:
-            data = [json.loads(params[k]) for k in params.keys()]
-            names = [d for d in params.keys()]
+        if task['params']:
+            data = [json.loads(task['params'][k]) for k in task['params'].keys()]
+            names = [d for d in task['params'].keys()]
             gen = itertools.product(*data)
         else:
             gen = [[1]]
@@ -125,33 +70,34 @@ class MonetDBDriver:
             if error != '':
                 break
             if debug:
-                print('Run query:', time.strftime('%Y-%m-%d %H:%m:%S', time.localtime()))
-                print('Parameter:', z)
-                print(query)
+                logging.info(f"Run query: {time.strftime('%Y-%m-%d %H:%m:%S', time.localtime())}")
+                logging.info(f'Parameter: {z}')
+                logging.info(task['query'])
 
             args = {}
             for n, v in zip(names, z):
-                if params:
+                if task['params']:
                     args.update({n: v})
             try:
-                preload = [ v for v in list(os.getloadavg())]
+                preload = [v for v in list(os.getloadavg())]
             except os.error:
                 preload = 0
 
             times = []
             chks = []
-            newquery = query
+            newquery = task['query']
             if z:
                 if debug:
-                    print('args:', args)
+                    logging.info(f'args:{args}')
                 # replace the variables in the query
                 for elm in args.keys():
                     newquery = re.sub(elm, str(args[elm]), newquery)
-                print('New query', newquery)
+                if debug:
+                    logging.info(f'New query {newquery}')
 
             for i in range(runlength):
                 try:
-                    c = MonetDBDriver.conn.cursor()
+                    c = conn.cursor()
 
                     ticks = time.time()
                     c.execute(newquery)
@@ -166,7 +112,7 @@ class MonetDBDriver:
                         print('ticks[%s]' % i, times[-1])
                     c.close()
                 except (Exception, pymonetdb.DatabaseError) as msg:
-                    print('EXCEPTION ', msg)
+                    logging.error('EXCEPTION ', msg)
                     error = str(msg).replace("\n", " ").replace("'", "''")
                     break
 
@@ -187,5 +133,5 @@ class MonetDBDriver:
             response.append(res)
         if debug:
             print('Finished the run')
-        MonetDBDriver.stopserver()
+            conn.close()
         return response

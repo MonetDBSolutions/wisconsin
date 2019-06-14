@@ -19,26 +19,32 @@ import yaml
 import logging
 
 from repository import Repository
-from connection import Connection
-from monetdb_driver import runtask, runbatch
+from sqalpel import Sqalpel
+from monetdb import MonetDB
 
 parser = argparse.ArgumentParser(
     description='This program is the MonetDB experiment driver for SQALPEL.io. '
-                'It requires an account on SQALPEL.io and being a member of the project team. '
-                'To contribute results you have to obtain a task ticket.'
+                'It requires an account on SQALPEL.io to obtain a task.'
                 'With the task ticket you can obtain the details of a single task.'
                 ''
                 'The program should be started on each machine on which you want to perform an experiment. '
-                'Offline experimentation against the baseline is supported as well.',
+                'Offline experimentation against the baseline queries is supported for debugging as well.',
     formatter_class=argparse.HelpFormatter)
 
 
 parser.add_argument('--ticket', type=str, help='Ticket', default='local')
-parser.add_argument('--driver', type=str, help='Target driver', default='MonetDB')
 parser.add_argument('--repository', type=str, help='Project Git', default='https://github.com/sqalpel/wisconsin.git')
+
+parser.add_argument('--server', type=str, help='Sqalpel server URL', default='localhost')
+
+parser.add_argument('--db', type=str, help='Default database', default='wisconsin')
 parser.add_argument('--dbms', type=str, help='Default DBMS', default='MonetDB')
-parser.add_argument('--db', type=str, help='Default database', default='base')
 parser.add_argument('--host', type=str, help='Default host', default='localhost')
+
+parser.add_argument('--bailout', type=int, help='Abort after a number of errors', default=None)
+parser.add_argument('--time', type=int, help='Abort lengthy experiments', default=None)
+
+parser.add_argument('--daemon', help='Keep on polling the webserver', action='store_false')
 parser.add_argument('--debug', help='Trace interaction', action='store_false')
 parser.add_argument('--version', help='Show version info', action='store_true')
 
@@ -56,85 +62,54 @@ if __name__ == '__main__':
                         format='%(levelname)-7s %(asctime)s  %(message)s',
                         datefmt='%H:%M:%S')
 
-    # Parse the sqalpel configuration
-    if not args.repository or not Repository.isvalid(args.repository):
-        print(f'Invalid repository {args.repository}')
-        exit(-1)
-
-    repos = Repository.get_yaml(args.repository, 'sqalpel.yaml')
-    logging.info(repos)
-    if not repos:
-        print('Error in sqalpel.yaml')
-        exit(-1)
-    elif 'parse_error' in repos:
-        print(f"Parse error in sqalpel.yaml {args.repository}")
-        exit(-1)
-
-    if 'dbms' not in repos:
-        print(f'Unkown dbms drivers')
-        exit(0)
-
-    # sanity check on the configuration file
-    if not args.dbms in repos['dbms']:
-        print(f'Unkown driver {args.dbms}')
-        exit(-1)
-    driver = repos['dbms'][args.dbms]
-
-    if args.debug:
-        logging.info(f"DRIVER {driver}")
-
-    # check local/remote processing
+    # Connect to the sqalpel.io webserver for the real work
     if args.ticket == 'local':
         if not args.repository:
-            print(f'Missing repository URL')
-            exit(-1)
-        if not args.db:
-            print(f'Missing database name')
-            exit(-1)
-        if not args.dbms:
-            print(f'Missing DBMS name')
-            exit(-1)
-        if not args.host:
-            print(f'Missing host')
+            logging.error(f'Missing repository URL')
             exit(-1)
 
-    # process the queries in the repository
-    experiments = None
-    if args.repository:
-        if args.debug:
-            print(f'process Git repository {args.repository}')
-        if Repository.isvalid(args.repository):
-            config = Repository.get_experiments(args.repository)
-            if not config or 'experiments' not in config:
-                print(f'Invalid experiment configuration {args.repository}')
-                exit(-1)
-            experiments = config['experiments']
+        # process the queries in the repository
+        config = Repository.get_experiments(args.repository)
+        if not config or 'experiments' not in config:
+            logging.error(f'Invalid experiment configuration {args.repository}')
+            exit(-1)
+        experiments = config['experiments']
+
+        results = []
+        for q in experiments:
             if args.debug:
-                print(f"QUERIES: {len(experiments)}")
-            results = runbatch(experiments, args)
-            print(results)
-            exit(0)
-        else:
-            print(f'Invalid repository URL {args.repository}')
-            exit(-1)
+                logging.info(f'run task {q}')
+            task = {'db': args.db,
+                    'dbms': args.dbms,
+                    'host': args.host,
+                    'query': q['source'],
+                    'xname': q['name'],
+                    'params': '',
+                    'options': '{}'}
+            r = MonetDB.run(task, debug=args.debug)
+            if args.debug:
+                logging.info(r)
+            results.append(r)
+        exit(0)
 
-    # Connect to the sqalpel.io webserver for the real work
-    conn = Connection(section)
-
+    # the main purpose, repeatedly get work from the webserver
+    conn = Sqalpel(args)
     delay = 5
-    bailout = section['bailout']
+    bailout = args.bailout
 
     while True:
-        task = conn.get_work(section)
+        task = conn.get_work()
         if task is None:
-            print('Lost connection with sqalpel.io server')
+            logging.info('Lost connection with sqalpel.io server')
             break
 
         # If we don't get any work we either should stop or wait for it
         if 'error' in task:
-            print('Server reported an error:', task)
+            if args.debug:
+                logging.error(f'Server reported an error: {task}')
+
             if task['error'] == 'Out of work' or task['error'] == 'Unknown task ticket':
-                if not section['daemon']:
+                if not args.daemon:
                     break
                 print('Wait %d seconds for more work' % delay)
                 time.sleep(delay)
@@ -154,7 +129,7 @@ if __name__ == '__main__':
             print(task)
             exit(0)
 
-        results = runtask(task)
+        results = MonetDB.run(task)
 
         print(results)
         if results and results[-1]['error'] != '':
