@@ -86,6 +86,10 @@ if __name__ == '__main__':
                     'xname': q['name'],
                     'params': '',
                     'options': '{}'}
+            if 'before' in q:
+                task.update({'before': q['before']})
+            if 'after' in q:
+                task.update({'after': q['after']})
             r = MonetDB.run(task, debug=args.debug)
             if args.debug:
                 logging.info(r)

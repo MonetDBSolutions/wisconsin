@@ -40,14 +40,20 @@ class MonetDB:
         :param debug:
         :return:
         """
-
+        if debug:
+            logging.info(f'Task:{task}')
         options = json.loads(task['options'])
         if 'runlength' in options:
             runlength = int(options['runlength'])
         else:
             runlength = 1
-        if debug:
-            logging.info(f'runs {runlength}')
+
+        before = ''
+        after = ''
+        if 'before' in task:
+            before = task['before']
+        if 'after' in task:
+            after = task['after']
 
         response = []
         error = ''
@@ -85,6 +91,7 @@ class MonetDB:
 
             times = []
             chks = []
+
             newquery = task['query']
             if z:
                 if debug:
@@ -92,13 +99,22 @@ class MonetDB:
                 # replace the variables in the query
                 for elm in args.keys():
                     newquery = re.sub(elm, str(args[elm]), newquery)
+                    if before:
+                        before = re.sub(elm, str(args[elm]), before)
+                    if after:
+                        after = re.sub(elm, str(args[elm]), after)
                 if debug:
                     logging.info(f'New query {newquery}')
+                    if before:
+                        logging.info(f'Before {before}')
+                    if after:
+                        logging.info(f'Before {after}')
 
             for i in range(runlength):
                 try:
                     c = conn.cursor()
-
+                    if before:
+                        c.execute(before)
                     ticks = time.time()
                     c.execute(newquery)
                     r = c.fetchone()
@@ -107,6 +123,8 @@ class MonetDB:
                     else:
                         chks.append('')
                     times.append(int((time.time() - ticks) * 1000))
+                    if after:
+                        c.execute(after)
 
                     if debug:
                         print('ticks[%s]' % i, times[-1])

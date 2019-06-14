@@ -7,6 +7,7 @@ Copyright 2019- Stichting Sqalpel
 
 Author: M Kersten
 The sqalpel.yaml file can be inspected for local processing
+The sqalpel.yaml file can be inspected for local processing
 """
 import logging
 import urllib.parse
