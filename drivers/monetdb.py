@@ -93,40 +93,49 @@ class MonetDB:
             chks = []
 
             newquery = task['query']
+            newbefore = before
+            newafter = after
             if z:
                 if debug:
                     logging.info(f'args:{args}')
                 # replace the variables in the query
                 for elm in args.keys():
                     newquery = re.sub(elm, str(args[elm]), newquery)
-                    if before:
-                        before = re.sub(elm, str(args[elm]), before)
-                    if after:
-                        after = re.sub(elm, str(args[elm]), after)
+                    if newbefore:
+                        newbefore = re.sub(elm, str(args[elm]), newbefore)
+                    if newafter:
+                        newafter = re.sub(elm, str(args[elm]), newafter)
                 if debug:
-                    logging.info(f'New query {newquery}')
-                    if before:
-                        logging.info(f'Before {before}')
-                    if after:
-                        logging.info(f'After {after}')
+                    if newbefore:
+                        logging.info(f'Before {newbefore}')
+                    logging.info(f'Query {newquery}')
+                    if newafter:
+                        logging.info(f'After {newafter}')
 
             for i in range(runlength):
                 try:
                     c = conn.cursor()
-                    if before:
-                        c.execute(before)
+                    if newbefore:
+                        c.execute(newbefore)
 
                     ticks = time.time()
                     c.execute(newquery)
-                    r = c.fetchone()
-                    if r:
-                        chks.append(int(r[0]))
-                    else:
+                    try:
+                        # if we have a result set, then obtain first row to represent it
+                        r = c.fetchone()
+                        if r:
+                            chks.append(int(r[0]))
+                        else:
+                            chks.append('')
+                    except (Exception, pymonetdb.DatabaseError):
                         chks.append('')
+                        pass
+
+
                     times.append(int((time.time() - ticks) * 1000))
 
-                    if after:
-                        c.execute(after)
+                    if newafter:
+                        c.execute(newafter)
 
                     if debug:
                         print('ticks[%s]' % i, times[-1])
