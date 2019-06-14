@@ -46,8 +46,8 @@
       remark : (no index) and Query 12 (clustered index) - JoinAselB
       source : CREATE TEMPORARY TABLE tmp AS
                  SELECT A.*, B.* FROM TENKTUP1 AS A , TENKTUP2 AS B
-                 WHERE (TENKTUP1.unique2 = TENKTUP2.unique2)
-                 AND (TENKTUP2.unique2 < 1000);
+                 WHERE (A.unique2 = B.unique2)
+                 AND (B.unique2 < 1000);
       after : DROP TABLE tmp;
 
     - name : Query10
@@ -73,8 +73,8 @@
       remark : (non-clustered index) - JoinAselB
       source : CREATE TEMPORARY TABLE tmp AS
                  SELECT A.* FROM TENKTUP1 AS A, TENKTUP2 AS B
-                 WHERE (TENKTUP1.unique1 = TENKTUP2.unique1)
-                   AND (TENKTUP1.unique2 < 1000);
+                 WHERE (A.unique1 = B.unique1)
+                   AND (A.unique2 < 1000);
       after : DROP TABLE tmp;
 
     - name : Query16
@@ -90,7 +90,7 @@
     - name : Query17
       remark : (non-clustered index) - JoinCselAselB
       source : CREATE TEMPORARY TABLE tmp AS
-                 SELECT * FROM ONEKTUP, TENKTUP1
+                 SELECT ONEKTUP.* FROM ONEKTUP, TENKTUP1
                  WHERE (ONEKTUP.unique1 = TENKTUP1.unique1)
                    AND (TENKTUP1.unique1 = TENKTUP2.unique1)
                    AND (TENKTUP1.unique1 < 1000);
