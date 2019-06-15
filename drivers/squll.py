@@ -42,7 +42,7 @@ parser.add_argument('--dbms', type=str, help='Default DBMS', default='MonetDB')
 parser.add_argument('--host', type=str, help='Default host', default='localhost')
 
 parser.add_argument('--bailout', type=int, help='Abort after a number of errors', default=None)
-parser.add_argument('--time', type=int, help='Abort lengthy experiments', default=None)
+parser.add_argument('--timeout', type=int, help='Abort lengthy experiments', default=None)
 
 parser.add_argument('--daemon', help='Keep on polling the webserver', action='store_false')
 parser.add_argument('--debug', help='Trace interaction', action='store_false')
