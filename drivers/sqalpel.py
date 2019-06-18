@@ -154,7 +154,13 @@ class Sqalpel:
                     logging.info(f'Query {newquery}')
                     if newafter:
                         logging.info(f'After {newafter}')
-
+            try:
+                # Collect some system metrics
+                preload = [v for v in list(os.getloadavg())]
+            except os.error:
+                preload = 0
+            self.metrics = {'load': preload}
+            
             yield newbefore, newquery, newafter
             res = {'times': self.times,
                    'chksum': self.chks,

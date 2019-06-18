@@ -43,12 +43,6 @@ class MonetDB:
             # Process all experiments multiple times
             for i in range(sqalpel.runlength):
                 try:
-                    # Collect some system metrics
-                    preload = [v for v in list(os.getloadavg())]
-                except os.error:
-                    preload = 0
-                sqalpel.metrics = {'load': preload}
-                try:
                     c = conn.cursor()
                     if before:
                         c.execute(before)
