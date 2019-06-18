@@ -164,6 +164,11 @@ class Sqalpel:
             if self.debug:
                 logging.info(f"Run {self.task}")
 
+            if self.debug:
+                logging.info(f"EXECUTE BEFORE {newbefore}")
+                logging.info(f"EXECUTE QUERY  {newquery}")
+                logging.info(f"EXECUTE AFTER  {newafter}")
+                
             yield newbefore, newquery, newafter
             res = {'times': self.times,
                    'chksum': self.chks,

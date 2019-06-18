@@ -33,10 +33,6 @@ class MonetDB:
 
         # Collects all variants of an experiment
         for before, query, after in sqalpel.generate():
-            if sqalpel.debug:
-                logging.info(f"EXECUTE BEFORE {before}")
-                logging.info(f"EXECUTE QUERY  {query}")
-                logging.info(f"EXECUTE AFTER  {after}")
 
             # Process all experiments multiple times
             try:
