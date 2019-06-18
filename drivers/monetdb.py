@@ -7,7 +7,7 @@ Copyright 2019- Stichting Sqalpel
 
 Author: M Kersten
 
-The prototypical MonetDB driver to run a Sqalpel experitment and report on it.
+The prototypical MonetDB driver to run a Sqalpel experiment and report on it.
 """
 
 import logging
@@ -22,7 +22,6 @@ class MonetDB:
         :param sqalpel:
         :return:
         """
-        logging.info(f"Run {sqalpel.task}")
 
         # Establish a clean connection
         try:
@@ -40,8 +39,8 @@ class MonetDB:
                 logging.info(f"EXECUTE AFTER  {after}")
 
             # Process all experiments multiple times
-            for i in range(sqalpel.runlength):
-                try:
+            try:
+                for i in range(sqalpel.runlength):
                     c = conn.cursor()
                     if before:
                         c.execute(before)
@@ -63,10 +62,9 @@ class MonetDB:
                         c.execute(after)
 
                     c.close()
-                except (Exception, pymonetdb.DatabaseError) as msg:
-                    logging.error(f'EXCEPTION  {msg}')
-                    sqalpel.error = str(msg).replace("\n", " ").replace("'", "''")
-                    break
+            except (Exception, pymonetdb.DatabaseError) as msg:
+                logging.error(f'EXCEPTION  {msg}')
+                sqalpel.error = str(msg).replace("\n", " ").replace("'", "''")
 
         # Establish a clean connection
         try:

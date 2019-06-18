@@ -161,6 +161,9 @@ class Sqalpel:
                 preload = 0
             self.metrics = {'load': preload}
 
+            if self.debug:
+                logging.info(f"Run {self.task}")
+
             yield newbefore, newquery, newafter
             res = {'times': self.times,
                    'chksum': self.chks,
