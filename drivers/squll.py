@@ -35,13 +35,13 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--ticket', type=str, help='Ticket', default='local')
 parser.add_argument('--repository', type=str, help='Project Git', default='https://github.com/sqalpel/wisconsin.git')
 
-parser.add_argument('--server', type=str, help='Sqalpel server URL', default='localhost')
+parser.add_argument('--server', type=str, help='Sqalpel server URL', default='localhost:5000')
 
 parser.add_argument('--db', type=str, help='Default database', default='wisconsin')
 parser.add_argument('--dbms', type=str, help='Default DBMS', default='MonetDB')
 parser.add_argument('--host', type=str, help='Default host', default='localhost')
 
-parser.add_argument('--bailout', type=int, help='Abort after a number of errors', default=None)
+parser.add_argument('--bailout', type=int, help='Abort after a number of errors', default=1)
 parser.add_argument('--timeout', type=int, help='Abort lengthy experiments', default=None)
 
 parser.add_argument('--daemon', help='Keep on polling the webserver', action='store_false')
@@ -63,6 +63,10 @@ if __name__ == '__main__':
                         datefmt='%H:%M:%S')
 
     # Connect to the sqalpel.io webserver for the real work
+    sqalpel = Sqalpel(args)
+
+    # Run the baseline queries locally for testing
+    # This may require to set ranges for variables
     if args.ticket == 'local':
         if not args.repository:
             logging.error(f'Missing repository URL')
@@ -76,75 +80,59 @@ if __name__ == '__main__':
         experiments = config['experiments']
 
         results = []
+        task = {'db': args.db,
+                'dbms': args.dbms,
+                'host': args.host,
+                'params': '',
+                'options': '{"runlength":1}'}
+
         for q in experiments:
-            if args.debug:
-                logging.info(f'run task {q}')
-            task = {'db': args.db,
-                    'dbms': args.dbms,
-                    'host': args.host,
-                    'query': q['source'],
-                    'xname': q['name'],
-                    'params': '',
-                    'options': '{"runlength":1}'}
+            task.update({'query': q['source']})
+            task.update({'xname': q['name']})
             # Before and After commands are optional
             if 'before' in q:
                 task.update({'before': q['before']})
+            else:
+                task.update({'before': ''})
             if 'after' in q:
                 task.update({'after': q['after']})
-            r = MonetDB.run(task, debug=args.debug)
-            if args.debug:
-                logging.info(r)
-            results.append(r)
+            else:
+                task.update({'after': ''})
+            sqalpel.prepare(task)
+            MonetDB.run(sqalpel)
         exit(0)
 
     # the main purpose, repeatedly get work from the webserver
-    conn = Sqalpel(args)
     delay = 5
     bailout = args.bailout
 
     while True:
-        task = conn.get_work()
-        if task is None:
-            logging.info('Lost connection with sqalpel.io server')
-            break
-
         # If we don't get any work we either should stop or wait for it
-        if 'error' in task:
+        if sqalpel.get_work():
+            MonetDB.run(sqalpel)
             if args.debug:
-                logging.error(f'Server reported an error: {task}')
+                logging.info(sqalpel.results)
 
-            if task['error'] == 'Out of work' or task['error'] == 'Unknown task ticket':
-                if not args.daemon:
-                    break
-                print('Wait %d seconds for more work' % delay)
-                time.sleep(delay)
-                if delay < 60:
-                    delay += 5
-                else:
-                    break
-                continue
-            elif task['error']:
-                bailout -= 1
-                if bailout == 0:
-                    print('Bail out after too many database server errors')
-                    break
-            continue
-
-        if args.get:
-            print(task)
-            exit(0)
-
-        results = MonetDB.run(task)
-
-        print(results)
-        if results and results[-1]['error'] != '':
-            bailout -= 1
-            if bailout == 0:
-                print('Bail out after too many database errors')
+        if sqalpel.error == 'Out of work' or sqalpel.error == 'Unknown task ticket':
+            if not args.daemon or sqalpel.error == 'Unknown task ticket':
                 break
-        if not conn.put_work(task, results):
-            print('Error encountered in sending result')
-            if not section['daemon']:
+            logging.info('Wait %d seconds for more work' % delay)
+            time.sleep(delay)
+            if delay < 60:
+                delay += 5
+            else:
+                break
+            continue
+        elif sqalpel.error:
+            if bailout == 0:
+                logging.error('Bail out after too many database errors')
+                break
+            bailout -= 1
+
+        if not sqalpel.put_work():
+            if args.debug:
+                logging.error(f'Error encountered in sending result: {sqalpel.error}')
+            if not args.daemon:
                 break
 
     if args.debug:

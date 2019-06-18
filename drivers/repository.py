@@ -6,14 +6,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Copyright 2019- Stichting Sqalpel
 
 Author: M Kersten
-The sqalpel.yaml file can be inspected for local processing
-The sqalpel.yaml file can be inspected for local processing
+The sqalpel.yaml file can be inspected for local processing.
+Use of pyyaml 5.1 is required for plugging an exploit
 """
 import logging
 import urllib.parse
 
 import requests
 import yaml
+
 
 class Repository:
     debug = False

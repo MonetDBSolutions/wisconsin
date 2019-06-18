@@ -1,4 +1,5 @@
 # the Sqalpel minimal environment to bootstrap a project
+  version : june2019
   projectname : Wisconsin
   projecttitle : 'The seminal database benchmark'
   documentation : doc/DOCUMENTATION.md
@@ -48,17 +49,17 @@
                  SELECT A.* FROM TENKTUP1 AS A , TENKTUP2 AS B
                  WHERE (A.unique2 = B.unique2)
                  AND (B.unique2 < 1000);
-      after : DROP TABLE tmp;
+      postlude : DROP TABLE tmp;
 
     - name : Query10
       remark : (no index) and Query 13 (clustered index) - JoinABprime
       source : CREATE TEMPORARY TABLE tmp AS
                   SELECT * FROM TENKTUP1, BPRIME
                   WHERE (TENKTUP1.unique2 = BPRIME.unique2);
-      before : CREATE TABLE BPRIME AS
+      prelude : CREATE TABLE BPRIME AS
                   SELECT * FROM TENKTUP2
                   WHERE TENKTUP2.unique2 < 1000;
-      after: DROP TABLE tmp;
+      postlude: DROP TABLE tmp;
 
     - name : Query11
       remark : (no index) and Query 14 (clustered index) - JoinCselAselB
@@ -67,7 +68,7 @@
                  WHERE (ONEKTUP.unique2 = TENKTUP1.unique2)
                    AND (TENKTUP1.unique2 = TENKTUP2.unique2)
                    AND (TENKTUP1.unique2 < 1000);
-      after : DROP TABLE tmp;
+      postlude : DROP TABLE tmp;
 
     - name : Query15
       remark : (non-clustered index) - JoinAselB
@@ -75,17 +76,17 @@
                  SELECT A.* FROM TENKTUP1 AS A, TENKTUP2 AS B
                  WHERE (A.unique1 = B.unique1)
                    AND (A.unique2 < 1000);
-      after : DROP TABLE tmp;
+      postlude : DROP TABLE tmp;
 
     - name : Query16
       remark : (non-clustered index) - JoinABprime
-      before : CREATE TABLE BPRIME AS
+      prelude : CREATE TABLE BPRIME AS
                  SELECT * FROM TENKTUP2
                  WHERE TENKTUP2.unique2 < 1000;
       source : CREATE TEMPORARY TABLE tmp AS
                  SELECT * FROM TENKTUP1, BPRIME
                  WHERE (TENKTUP1.unique1 = BPRIME.unique1);
-      after : DROP TABLE tmp;
+      postlude : DROP TABLE tmp;
 
     - name : Query17
       remark : (non-clustered index) - JoinCselAselB
@@ -94,14 +95,14 @@
                  WHERE (ONEKTUP.unique1 = TENKTUP1.unique1)
                    AND (TENKTUP1.unique1 = TENKTUP2.unique1)
                    AND (TENKTUP1.unique1 < 1000);
-      after : DROP TABLE tmp;
+      postlude : DROP TABLE tmp;
 
     - name : Query18
       remark : Projection with 1% Projection
       source : CREATE TEMPORARY TABLE tmp AS
                SELECT DISTINCT two, four, ten, twenty, hundred, string4
                FROM TENKTUP1;
-      after : DROP TABLE tmp;
+      postlude : DROP TABLE tmp;
 
     - name : Query19
       remark : Projection with 100% Projection
@@ -109,27 +110,27 @@
                SELECT DISTINCT two, four, ten, twenty, hundred,
                evenHundred, oddHundred, stringu1, stringu2, string4
                FROM TENKTUP1;
-      after : DROP TABLE tmp;
+      postlude : DROP TABLE tmp;
 
     - name : Query20
       remark : (no index) and Query 23 (with clustered index) Minimum Aggregate Function
       source : CREATE TEMPORARY TABLE tmp AS
                SELECT MIN (TENKTUP1.unique2) FROM TENKTUP1;
-      after : DROP TABLE tmp;
+      postlude : DROP TABLE tmp;
 
     - name : Query21
       remark : (no index) and Query 24 (with clustered index) Minimum Aggregate Function with 100 Partitions
       source : CREATE TEMPORARY TABLE tmp AS
                SELECT MIN (TENKTUP1.unique2) FROM TENKTUP1
                GROUP BY TENKTUP1.hundred;
-      after : DROP TABLE tmp;
+      postlude : DROP TABLE tmp;
 
     - name : Query22
       remark : (no index) and Query 25 (with clustered index) Sun Aggregate Function with 100 Partitions
       source : CREATE TEMPORARY TABLE tmp AS
                SELECT SUM (TENKTUP1.unique2) FROM TENKTUP1
                GROUP BY TENKTUP1.hundred;
-      after : DROP TABLE tmp;
+      postlude : DROP TABLE tmp;
 
     - name : Query26
       remark : (no indices) and Query 29 (with indices) - Insert 1 tuple

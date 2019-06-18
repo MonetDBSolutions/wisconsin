@@ -7,160 +7,78 @@ Copyright 2019- Stichting Sqalpel
 
 Author: M Kersten
 
-Execute a single query multiple times on the database nicknamed 'db'
-and return a list of timings. The first error encountered aborts the sequence.
-The result is a list of dictionaries
-run: [{
-    times: [<response time>]
-    chks: [<integer value to represent result (e.g. cnt,  checksum or hash over result set) >]
-    param: {param1:value1, ....}
-    errors: []
-    }]
-
-If parameter value lists are given, we run the query for each element in the product.
-
-Internal metrics, e.g. cpu load, is returned as a JSON structure in 'metrics' column
+The prototypical MonetDB driver to run a Sqalpel experitment and report on it.
 """
 
-import re
 import logging
-import time
 import pymonetdb
 import os
-import itertools
-import json
 
 
 class MonetDB:
 
     @staticmethod
-    def run(task, debug=True):
+    def run(sqalpel):
         """
-        :param task:
-        :param debug:
+        :param sqalpel:
         :return:
         """
-        if debug:
-            logging.info(f'Task:{task}')
-        options = json.loads(task['options'])
-        if 'runlength' in options:
-            runlength = int(options['runlength'])
-        else:
-            runlength = 1
+        logging.info(f"Run {sqalpel.task}")
 
-        before = ''
-        after = ''
-        if 'before' in task:
-            before = task['before']
-        if 'after' in task:
-            after = task['after']
-
-        response = []
-        error = ''
-        # always run an experiment in a cleanly started connection
+        # Establish a clean connection
         try:
-            conn = pymonetdb.connect(database=task['db'])
+            conn = pymonetdb.connect(database=sqalpel.db)
         except (Exception, pymonetdb.DatabaseError) as msg:
+            sqalpel.error = msg
             logging.error(f"EXCEPTION {msg}")
-            return {'error': msg, 'times': [], 'chks': [], 'param': []}
+            return
 
-        if task['params']:
-            data = [json.loads(task['params'][k]) for k in task['params'].keys()]
-            names = [d for d in task['params'].keys()]
-            gen = itertools.product(*data)
-        else:
-            gen = [[1]]
-            names = ['_ * _']
+        # Collects all variants of an experiment
+        for before, query, after in sqalpel.generate():
+            if sqalpel.debug:
+                logging.info(f"EXECUTE BEFORE {before}")
+                logging.info(f"EXECUTE QUERY  {query}")
+                logging.info(f"EXECUTE AFTER  {after}")
 
-        for z in gen:
-            if error != '':
-                break
-            if debug:
-                logging.info(f"Run query: {time.strftime('%Y-%m-%d %H:%m:%S', time.localtime())}")
-                logging.info(f'Parameter: {z}')
-                logging.info(task['query'])
-
-            args = {}
-            for n, v in zip(names, z):
-                if task['params']:
-                    args.update({n: v})
-            try:
-                preload = [v for v in list(os.getloadavg())]
-            except os.error:
-                preload = 0
-
-            times = []
-            chks = []
-
-            newquery = task['query']
-            newbefore = before
-            newafter = after
-            if z:
-                if debug:
-                    logging.info(f'args:{args}')
-                # replace the variables in the query
-                for elm in args.keys():
-                    newquery = re.sub(elm, str(args[elm]), newquery)
-                    if newbefore:
-                        newbefore = re.sub(elm, str(args[elm]), newbefore)
-                    if newafter:
-                        newafter = re.sub(elm, str(args[elm]), newafter)
-                if debug:
-                    if newbefore:
-                        logging.info(f'Before {newbefore}')
-                    logging.info(f'Query {newquery}')
-                    if newafter:
-                        logging.info(f'After {newafter}')
-
-            for i in range(runlength):
+            # Process all experiments multiple times
+            for i in range(sqalpel.runlength):
+                try:
+                    # Collect some system metrics
+                    preload = [v for v in list(os.getloadavg())]
+                except os.error:
+                    preload = 0
+                sqalpel.metrics = {'load': preload}
                 try:
                     c = conn.cursor()
-                    if newbefore:
-                        c.execute(newbefore)
+                    if before:
+                        c.execute(before)
 
-                    ticks = time.time()
-                    c.execute(newquery)
+                    sqalpel.start()
+                    c.execute(query)
                     try:
                         # if we have a result set, then obtain first row to represent it
                         r = c.fetchone()
                         if r:
-                            chks.append(int(r[0]))
+                            sqalpel.keep(r)
                         else:
-                            chks.append('')
-                    except (Exception, pymonetdb.DatabaseError):
-                        chks.append('')
-                        pass
+                            sqalpel.keep('')
+                    except (Exception, pymonetdb.DatabaseError) as e:
+                        sqalpel.error = e
+                    sqalpel.done()
 
+                    if after:
+                        c.execute(after)
 
-                    times.append(int((time.time() - ticks) * 1000))
-
-                    if newafter:
-                        c.execute(newafter)
-
-                    if debug:
-                        print('ticks[%s]' % i, times[-1])
                     c.close()
                 except (Exception, pymonetdb.DatabaseError) as msg:
                     logging.error(f'EXCEPTION  {msg}')
-                    error = str(msg).replace("\n", " ").replace("'", "''")
+                    sqalpel.error = str(msg).replace("\n", " ").replace("'", "''")
                     break
 
-            # wrapup the experimental runs,
-            # The load can be sent as something extra, it is an internal metric
-            try:
-                postload = [v for v in list(os.getloadavg())]
-            except os.error:
-                postload = 0
-
-            res = {'times': times,
-                   'chksum': chks,
-                   'param': args,
-                   'error': error,
-                   'metrics': {'load': preload + postload},
-                   }
-
-            response.append(res)
-        if debug:
-            print('Finished the run')
+        # Establish a clean connection
+        try:
             conn.close()
-        return response
+        except (Exception, pymonetdb.DatabaseError) as msg:
+            sqalpel.error = msg
+            logging.error(f"EXCEPTION {msg}")
+            return
