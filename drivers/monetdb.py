@@ -12,7 +12,6 @@ The prototypical MonetDB driver to run a Sqalpel experitment and report on it.
 
 import logging
 import pymonetdb
-import os
 
 
 class MonetDB:
@@ -59,7 +58,6 @@ class MonetDB:
                             sqalpel.keep('')
                     except (Exception, pymonetdb.DatabaseError) as e:
                         sqalpel.error = e
-
 
                     if after:
                         c.execute(after)

@@ -160,7 +160,7 @@ class Sqalpel:
             except os.error:
                 preload = 0
             self.metrics = {'load': preload}
-            
+
             yield newbefore, newquery, newafter
             res = {'times': self.times,
                    'chksum': self.chks,
