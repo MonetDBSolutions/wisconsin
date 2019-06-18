@@ -138,8 +138,8 @@ class Sqalpel:
             self.chks = []
 
             newquery = self.task['query']
-            newbefore = self.before
-            newafter = self.after
+            newbefore = self.prelude
+            newafter = self.postlude
             if z:
                 # replace the variables in the query
                 for elm in self.args.keys():

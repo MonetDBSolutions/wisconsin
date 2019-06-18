@@ -55,6 +55,7 @@ class MonetDB:
 
                     sqalpel.start()
                     c.execute(query)
+                    sqalpel.done()
                     try:
                         # if we have a result set, then obtain first row to represent it
                         r = c.fetchone()
@@ -64,7 +65,7 @@ class MonetDB:
                             sqalpel.keep('')
                     except (Exception, pymonetdb.DatabaseError) as e:
                         sqalpel.error = e
-                    sqalpel.done()
+
 
                     if after:
                         c.execute(after)
